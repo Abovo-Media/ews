@@ -9,10 +9,10 @@ import (
 )
 
 type Logger interface {
-	Server(url string, ver Version)
-	HttpRequest(req *http.Request, body []byte)
-	HttpResponse(resp *http.Response, body []byte)
-	Response(resp ewsxml.Response)
+	LogClientStart(url string, ver Version)
+	LogHttpRequest(req *http.Request, body []byte)
+	LogHttpResponse(resp *http.Response)
+	LogResponse(resp ewsxml.Response)
 }
 
 func DefaultLogger() Logger { return new(logger) }
@@ -20,11 +20,11 @@ func NopLogger() Logger     { return new(nopLogger) }
 
 type logger struct{}
 
-func (l *logger) Server(url string, ver Version) {
-	log.Println("EWS Server:", url, ver)
+func (l *logger) LogClientStart(url string, ver Version) {
+	log.Println("EWS LogClientStart:", url, ver)
 }
 
-func (l *logger) HttpRequest(req *http.Request, body []byte) {
+func (l *logger) LogHttpRequest(req *http.Request, body []byte) {
 	dump, err := httputil.DumpRequestOut(req, false)
 	if err != nil {
 		log.Println("Dump error:", err)
@@ -33,16 +33,16 @@ func (l *logger) HttpRequest(req *http.Request, body []byte) {
 	}
 }
 
-func (l *logger) HttpResponse(resp *http.Response, body []byte) {
-	dump, err := httputil.DumpResponse(resp, false)
+func (l *logger) LogHttpResponse(resp *http.Response) {
+	dump, err := httputil.DumpResponse(resp, true)
 	if err != nil {
 		log.Println("Dump error:", err)
 	} else {
-		log.Printf("Response:\n%s%s\n----\n", dump, body)
+		log.Printf("LogResponse:\n%s%s\n----\n", dump)
 	}
 }
 
-func (l *logger) Response(resp ewsxml.Response) {
+func (l *logger) LogResponse(resp ewsxml.Response) {
 	if resp.ResponseCode == ewsxml.NoError {
 		return
 	}
@@ -51,7 +51,7 @@ func (l *logger) Response(resp ewsxml.Response) {
 
 type nopLogger struct{}
 
-func (_ *nopLogger) Server(_ string, _ Version)              {}
-func (_ *nopLogger) HttpRequest(_ *http.Request, _ []byte)   {}
-func (_ *nopLogger) HttpResponse(_ *http.Response, _ []byte) {}
-func (_ *nopLogger) Response(_ ewsxml.Response)              {}
+func (_ *nopLogger) LogClientStart(_ string, _ Version)       {}
+func (_ *nopLogger) LogHttpRequest(_ *http.Request, _ []byte) {}
+func (_ *nopLogger) LogHttpResponse(_ *http.Response)         {}
+func (_ *nopLogger) LogResponse(_ ewsxml.Response)            {}

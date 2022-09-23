@@ -9,9 +9,9 @@ type Version string
 func (v Version) String() string { return string(v) }
 
 type Header struct {
-	XMLName               xml.Name               `xml:"soap:Header"`
-	RequestServerVersion  RequestServerVersion   `xml:"t:RequestServerVersion"`
-	ExchangeImpersonation *ExchangeImpersonation `xml:"t:ExchangeImpersonation,omitempty"`
+	XMLName               xml.Name `xml:"soap:Header"`
+	RequestServerVersion  RequestServerVersion
+	ExchangeImpersonation *ExchangeImpersonation `xml:",omitempty"`
 }
 
 func (h *Header) ServerVersion(ver Version) {
@@ -33,17 +33,17 @@ func (h *Header) ImpersonatePrimarySmtpAddress(v string) {
 }
 
 type RequestServerVersion struct {
-	Version Version `xml:"Version,attr"`
+	Version Version `xml:",attr"`
 }
 
 type ExchangeImpersonation struct {
-	ConnectingSID ConnectingSID `xml:"t:ConnectingSID,omitempty"`
+	ConnectingSID ConnectingSID `xml:",omitempty"`
 }
 
-// https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/connectingsid
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/connectingsid
 type ConnectingSID struct {
-	PrincipalName      string `xml:"t:PrincipalName,omitempty"`
-	SID                string `xml:"t:SID,omitempty"`
-	SmtpAddress        string `xml:"t:SmtpAddress,omitempty"`
-	PrimarySmtpAddress string `xml:"t:PrimarySmtpAddress,omitempty"`
+	PrincipalName      string `xml:",omitempty"`
+	SID                string `xml:",omitempty"`
+	SmtpAddress        string `xml:",omitempty"`
+	PrimarySmtpAddress string `xml:",omitempty"`
 }

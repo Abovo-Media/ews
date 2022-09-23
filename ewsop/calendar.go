@@ -1,27 +1,25 @@
-package ews
+package ewsop
 
 import (
 	"context"
 	"encoding/xml"
 
+	"github.com/Abovo-Media/go-ews"
 	"github.com/Abovo-Media/go-ews/ewsxml"
 )
 
 type FindItemCalendarViewOperation struct {
-	header   ewsxml.Header
+	Header   ewsxml.Header
 	FindItem struct {
 		ewsxml.FindItem
 		CalendarView ewsxml.CalendarView
 
-		// https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/parentfolderids
+		// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/parentfolderids
 		ParentFolderIds struct {
-			DistinguishedFolderId ewsxml.DistinguishedFolderId `xml:"t:DistinguishedFolderId"`
+			DistinguishedFolderId ewsxml.DistinguishedFolderId
 		} `xml:"m:ParentFolderIds"`
 	}
 }
-
-func (op *FindItemCalendarViewOperation) Header() *ewsxml.Header { return &op.header }
-func (op *FindItemCalendarViewOperation) Body() interface{}      { return op.FindItem }
 
 type FindItemCalendarViewResponse struct {
 	XMLName          xml.Name `xml:"FindItemResponse"`
@@ -30,7 +28,7 @@ type FindItemCalendarViewResponse struct {
 	}
 }
 
-func GetCalendars(ctx context.Context, req Requester, op *FindItemCalendarViewOperation) (*FindItemCalendarViewResponse, error) {
+func GetCalendars(ctx context.Context, req ews.Requester, op *FindItemCalendarViewOperation) (*FindItemCalendarViewResponse, error) {
 	if op.FindItem.Traversal == "" {
 		op.FindItem.Traversal = ewsxml.Traversal_Shallow
 	}
@@ -40,5 +38,5 @@ func GetCalendars(ctx context.Context, req Requester, op *FindItemCalendarViewOp
 	op.FindItem.ParentFolderIds.DistinguishedFolderId.Id = "calendar"
 
 	var out FindItemCalendarViewResponse
-	return &out, req.Request(NewOperationRequest(ctx, op), &out)
+	return &out, req.Request(ews.NewRequest(ctx, &op.Header, op.FindItem), &out)
 }

@@ -26,25 +26,25 @@ type ResponseEnvelope struct {
 	XMLName xml.Name `xml:"Envelope"`
 	Body    struct {
 		Response []byte `xml:",innerxml"`
-	} `xml:"Body"`
+	}
 }
 
-// https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/responsemessage
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/responsemessage
 type Response struct {
-	ResponseClass ResponseClass `xml:"ResponseClass,attr"`
+	ResponseClass ResponseClass `xml:",attr"`
 	// The MessageText element provides a text description of the status of the
 	// response.
-	// https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/messagetext
-	MessageText  string       `xml:"MessageText"`
-	ResponseCode ResponseCode `xml:"ResponseCode"`
-	MessageXml   MessageXml   `xml:"MessageXml"`
+	// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/messagetext
+	MessageText  string
+	ResponseCode ResponseCode
+	MessageXml   MessageXml
 }
 
 func (r Response) String() string { return r.MessageText }
 
 type MessageXml struct {
-	ExceptionType       string `xml:"ExceptionType"`
-	ExceptionCode       string `xml:"ExceptionCode"`
-	ExceptionServerName string `xml:"ExceptionServerName"`
-	ExceptionMessage    string `xml:"ExceptionMessage"`
+	ExceptionType       string
+	ExceptionCode       string
+	ExceptionServerName string
+	ExceptionMessage    string
 }

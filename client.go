@@ -17,6 +17,7 @@ type Version = ewsxml.Version
 //goland:noinspection GoUnusedConst,GoSnakeCaseUsage
 const (
 	Exchange2010     Version = "Exchange2010"
+	Exchange2013     Version = "Exchange2013"
 	Exchange2013_SP1 Version = "Exchange2013_SP1"
 
 	RequestError   errors.Kind = "request error"
@@ -56,7 +57,7 @@ func NewClient(url string, ver Version, opts ...Option) (Client, error) {
 		errors.Append(&err, opt(c))
 	}
 
-	c.log.Server(url, ver)
+	c.log.LogClientStart(url, ver)
 	return c, err
 }
 
@@ -82,7 +83,7 @@ func (c *client) Do(req *Request) (*http.Response, error) {
 
 	body := getBuffer()
 	defer releaseBuffer(body)
-	if err := req.WriteBody(body); err != nil {
+	if _, err := req.WriteTo(body); err != nil {
 		return nil, err
 	}
 
@@ -98,26 +99,27 @@ func (c *client) Do(req *Request) (*http.Response, error) {
 	}
 	httpReq.Header.Set("Content-Type", "text/xml")
 
-	c.log.HttpRequest(httpReq, body.Bytes())
+	c.log.LogHttpRequest(httpReq, body.Bytes())
 	return c.http.Do(httpReq)
 }
 
-func (c *client) Request(req *Request, out interface{}) error {
+func (c *client) Request(req *Request, out interface{}) (err error) {
 	resp, err := c.Do(req)
 	if err != nil {
 		return err
 	}
+
 	defer errors.AppendFunc(&err, resp.Body.Close)
+	c.log.LogHttpResponse(resp)
+
+	if resp.StatusCode != http.StatusOK {
+		errors.Append(&err, NewError(resp))
+		return err
+	}
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return errors.WithStack(err)
-	}
-
-	c.log.HttpResponse(resp, data)
-
-	if resp.StatusCode != http.StatusOK {
-		return NewError(resp)
 	}
 
 	var x ewsxml.ResponseEnvelope

@@ -29,7 +29,7 @@ import "github.com/Abovo-Media/go-ews"
 ```
 
 ## EWS operations reference
-https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/ews-operations-in-exchange
+https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/ews-operations-in-exchange
 
 ## License
 Copyright © 2022 [Abovo Media](https://www.abovomedia.nl/). All rights reserved.

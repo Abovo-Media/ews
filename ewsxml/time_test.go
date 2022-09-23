@@ -7,7 +7,6 @@ import (
 )
 
 func Test_getRFC3339Offset(t *testing.T) {
-
 	riyadh, _ := time.LoadLocation("Asia/Riyadh")
 	marquesas, _ := time.LoadLocation("Pacific/Marquesas")
 

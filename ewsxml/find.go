@@ -13,17 +13,10 @@ func (s Traversal) String() string { return string(s) }
 
 // The BaseShape element identifies the set of properties to return in an item
 // or folder response.
-// https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/baseshape
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/baseshape
 type BaseShape string
 
 func (s BaseShape) String() string { return string(s) }
-
-// The BodyType element identifies how the body text is formatted in the
-// response.
-// https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/bodytype
-type BodyType string
-
-func (s BodyType) String() string { return string(s) }
 
 //goland:noinspection GoUnusedConst,GoSnakeCaseUsage
 const (
@@ -61,73 +54,64 @@ const (
 	BodyType_Text BodyType = "Text"
 )
 
-// The Body element specifies the body of an item.
-// https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/body
-type Body struct {
-	XMLName     xml.Name `xml:"t:Body"`
-	BodyType    BodyType `xml:"BodyType,attr"`
-	IsTruncated bool     `xml:"IsTruncated,attr"`
-	Contents    []byte   `xml:",chardata"`
-}
-
 // The FindItem element defines a request to find items in a mailbox.
-// https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/finditem
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/finditem
 type FindItem struct {
 	XMLName   xml.Name  `xml:"m:FindItem"`
-	Traversal Traversal `xml:"Traversal,attr"`
+	Traversal Traversal `xml:",attr"`
 	ItemShape ItemShape
 }
 
 // The ItemShape element identifies a set of properties to return in a GetItem
 // operation, FindItem operation, or SyncFolderItems operation response.
-// https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/itemshape
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/itemshape
 type ItemShape struct {
 	XMLName            xml.Name  `xml:"m:ItemShape"`
-	BaseShape          BaseShape `xml:"t:BaseShape,omitempty"`
-	IncludeMimeContent bool      `xml:"t:IncludeMimeContent,omitempty"`
-	BodyType           BodyType  `xml:"t:BodyType,omitempty"`
-	FilterHtmlContent  bool      `xml:"t:FilterHtmlContent,omitempty"`
+	BaseShape          BaseShape `xml:",omitempty"`
+	IncludeMimeContent bool      `xml:",omitempty"`
+	BodyType           BodyType  `xml:",omitempty"`
+	FilterHtmlContent  bool      `xml:",omitempty"`
 	// ConvertHtmlCodePageToUTF8
 	// AdditionalProperties
 }
 
-type IndexedPageItemView struct {
-	XMLName xml.Name `xml:"IndexedPageItemView"`
-}
+// type IndexedPageItemView struct {
+// 	XMLName xml.Name `xml:"IndexedPageItemView"`
+// }
 
-type FractionalPageItemView struct {
-	XMLName xml.Name `xml:"FractionalPageItemView"`
-}
+// type FractionalPageItemView struct {
+// 	XMLName xml.Name `xml:"FractionalPageItemView"`
+// }
 
 type CalendarView struct {
 	XMLName            xml.Name  `xml:"m:CalendarView"`
-	MaxEntriesReturned uint      `xml:"MaxEntriesReturned,attr,omitempty"`
-	StartDate          time.Time `xml:"StartDate,attr"`
-	EndDate            time.Time `xml:"EndDate,attr"`
+	MaxEntriesReturned uint      `xml:",attr,omitempty"`
+	StartDate          time.Time `xml:",attr"`
+	EndDate            time.Time `xml:",attr"`
 }
 
-type ContactsView struct {
-	XMLName xml.Name `xml:"ContactsView"`
-}
+// type ContactsView struct {
+// 	XMLName xml.Name `xml:"ContactsView"`
+// }
 
 // The FindItemResponseMessage element contains the status and result of a
 // single FindItem operation request.
-// https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/finditemresponsemessage
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/finditemresponsemessage
 type FindItemResponseMessage struct {
 	Response
-	DescriptiveLinkKey int `xml:"DescriptiveLinkKey,attr"`
+	DescriptiveLinkKey int `xml:",attr"`
 	RootFolder         RootFolder
 }
 
 // The RootFolder element contains the results of a search of a single root
 // folder during a FindItem operation.
-// https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/rootfolder-finditemresponsemessage
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/rootfolder-finditemresponsemessage
 type RootFolder struct {
-	IndexedPagingOffset     int  `xml:"IndexedPagingOffset,attr"`
-	NumeratorOffset         int  `xml:"NumeratorOffset,attr"`
-	AbsoluteDenominator     int  `xml:"AbsoluteDenominator,attr"`
-	IncludesLastItemInRange bool `xml:"IncludesLastItemInRange,attr"`
-	TotalItemsInView        int  `xml:"TotalItemsInView,attr"`
+	IndexedPagingOffset     int  `xml:",attr"`
+	NumeratorOffset         int  `xml:",attr"`
+	AbsoluteDenominator     int  `xml:",attr"`
+	IncludesLastItemInRange bool `xml:",attr"`
+	TotalItemsInView        int  `xml:",attr"`
 	Items                   Items
 	// Groups
 }

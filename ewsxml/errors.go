@@ -1,7 +1,7 @@
 package ewsxml
 
 // The ResponseCode element provides status information about the request.
-// https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/responsecode
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/responsecode
 type ResponseCode string
 
 func (r ResponseCode) String() string { return string(r) }
@@ -68,14 +68,14 @@ const (
 
 	// ErrorAttachmentNestLevelLimitExceeded specifies that an attempt was made
 	// to create an item with more than 10 nested attachments. This value was
-	// introduced in Exchange Server 2010 Service Pack 2 (SP2).
+	// introduced in Exchange LogClientStart 2010 Service Pack 2 (SP2).
 	ErrorAttachmentNestLevelLimitExceeded ResponseCode = "ErrorAttachmentNestLevelLimitExceeded"
 
 	// ErrorAttachmentSizeLimitExceeded is returned by the CreateAttachment
 	// element if an attempt is made to create an attachment with size
-	// exceeding Int32.MaxValue, in bytes. The GetAttachment element returns
+	// exceeding TryInt32.MaxValue, in bytes. The GetAttachment element returns
 	// this error if an attempt to retrieve an existing attachment with size
-	// exceeding Int32.MaxValue, in bytes.
+	// exceeding TryInt32.MaxValue, in bytes.
 	ErrorAttachmentSizeLimitExceeded ResponseCode = "ErrorAttachmentSizeLimitExceeded"
 
 	// ErrorAutoDiscoverFailed indicates that Exchange Web Services tried to
@@ -568,7 +568,7 @@ const (
 
 	// ErrorImContactLimitReached is returned when new instant messaging (IM)
 	// contacts cannot be added because the maximum number of contacts has been
-	// reached. This error was introduced in Exchange Server 2013.
+	// reached. This error was introduced in Exchange LogClientStart 2013.
 	ErrorImContactLimitReached ResponseCode = "ErrorImContactLimitReached"
 
 	// ErrorImGroupDisplayNameAlreadyExists is returned when an attempt is made
@@ -604,7 +604,7 @@ const (
 	ErrorImpersonationFailed ResponseCode = "ErrorImpersonationFailed"
 
 	// ErrorIncorrectSchemaVersion indicates that the request was valid for the
-	// current Exchange Server version but was invalid for the request server
+	// current Exchange LogClientStart version but was invalid for the request server
 	// version that was specified.
 	ErrorIncorrectSchemaVersion ResponseCode = "ErrorIncorrectSchemaVersion"
 
@@ -1589,7 +1589,7 @@ const (
 	// ErrorOccurrenceTimeSpanTooBig indicates that the time allotment for a
 	// given occurrence overlaps with another occurrence of the same recurring
 	// item. This response also occurs when the length in minutes of a given
-	// occurrence is larger than Int32.MaxValue.
+	// occurrence is larger than TryInt32.MaxValue.
 	ErrorOccurrenceTimeSpanTooBig ResponseCode = "ErrorOccurrenceTimeSpanTooBig"
 
 	// ErrorOperationNotAllowedWithPublicFolderRoot indicates that the current
@@ -1691,14 +1691,14 @@ const (
 
 	// ErrorPublicFolderRequestProcessingFailed occurs when the recipient that
 	// was passed to the GetUserAvailability operation is located on a computer
-	// that is running a version of Exchange Server that is earlier than
+	// that is running a version of Exchange LogClientStart that is earlier than
 	// Exchange 2007, and the request to retrieve free/busy information for the
 	// recipient from the public folder server failed.
 	ErrorPublicFolderRequestProcessingFailed ResponseCode = "ErrorPublicFolderRequestProcessingFailed"
 
 	// ErrorPublicFolderServerNotFound occurs when the recipient that was
 	// passed to the GetUserAvailability operation is located on a computer
-	// that is running a version of Exchange Server that is earlier than
+	// that is running a version of Exchange LogClientStart that is earlier than
 	// Exchange 2007, and the request to retrieve free/busy information for
 	// the recipient from the public folder server failed because the
 	// organizational unit did not have an associated public folder server.
@@ -1903,12 +1903,12 @@ const (
 	ErrorTeamMailboxNotFound ResponseCode = "ErrorTeamMailboxNotFound"
 
 	// ErrorTeamMailboxNotLinkedToSharePoint indicates that a team mailbox was
-	// found but that it is not linked to a SharePoint Server.
+	// found but that it is not linked to a SharePoint LogClientStart.
 	// This error was introduced in Exchange 2013.
 	ErrorTeamMailboxNotLinkedToSharePoint ResponseCode = "ErrorTeamMailboxNotLinkedToSharePoint"
 
 	// ErrorTeamMailboxUrlValidationFailed indicates that a team mailbox was
-	// found but that the link to the SharePoint Server is not valid.
+	// found but that the link to the SharePoint LogClientStart is not valid.
 	// This error was introduced in Exchange 2013.
 	ErrorTeamMailboxUrlValidationFailed ResponseCode = "ErrorTeamMailboxUrlValidationFailed"
 

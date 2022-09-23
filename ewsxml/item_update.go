@@ -47,13 +47,13 @@ const (
 )
 
 // The UpdateItem element defines a request to update an item in a mailbox.
-// https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/updateitem
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/updateitem
 type UpdateItem struct {
 	XMLName                               xml.Name                              `xml:"m:UpdateItem"`
-	ConflictResolution                    ConflictResolution                    `xml:"ConflictResolution,attr"`
-	MessageDisposition                    MessageDisposition                    `xml:"MessageDisposition,attr"`
-	SendMeetingInvitationsOrCancellations SendMeetingInvitationsOrCancellations `xml:"SendMeetingInvitationsOrCancellations,attr"`
-	SuppressReadReceipts                  bool                                  `xml:"SuppressReadReceipts,attr"`
+	ConflictResolution                    ConflictResolution                    `xml:",attr"`
+	MessageDisposition                    MessageDisposition                    `xml:",attr"`
+	SendMeetingInvitationsOrCancellations SendMeetingInvitationsOrCancellations `xml:",attr"`
+	SuppressReadReceipts                  bool                                  `xml:",attr"`
 
 	SavedItemFolderId SavedItemFolderId
 	ItemChanges       []ItemChange `xml:"m:ItemChanges"`
@@ -61,7 +61,7 @@ type UpdateItem struct {
 
 // The ItemChange element contains an item identifier and the updates to apply
 // to the item.
-// https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/itemchange
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/itemchange
 type ItemChange struct {
 	XMLName               xml.Name `xml:"m:ItemChange"`
 	ItemId                ItemId
@@ -70,6 +70,6 @@ type ItemChange struct {
 	Updates               Updates
 }
 
-// https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/updates-item
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/updates-item
 type Updates struct {
 }

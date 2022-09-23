@@ -1,25 +1,24 @@
 package ewsxml
 
 import (
-	"strings"
 	"time"
 )
 
 // The Sensitivity element indicates the sensitivity level of an item.
-// https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/sensitivity
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/sensitivity
 type Sensitivity string
 
 func (s Sensitivity) String() string { return string(s) }
 
 // The LegacyFreeBusyStatus element represents the free/busy status of the
 // calendar item.
-// https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/legacyfreebusystatus
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/legacyfreebusystatus
 type LegacyFreeBusyStatus string
 
 func (s LegacyFreeBusyStatus) String() string { return string(s) }
 
 // The CalendarItemType element represents the type of a calendar item.
-// https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/calendaritemtype
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/calendaritemtype
 type CalendarItemType string
 
 func (s Sensitivity) CalendarItemType() string { return string(s) }
@@ -53,96 +52,89 @@ const (
 )
 
 // The CalendarItem element represents an Exchange calendar item.
-// https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/calendaritem
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/calendaritem
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/createitem-operation-calendar-item
 type CalendarItem struct {
-	Data []byte `xml:",innerxml"`
-	// MimeContent                  string      `xml:"t:MimeContent"`
-	ItemId         ItemId `xml:",omitempty"`
-	ParentFolderId ItemId `xml:",omitempty"`
-	// ItemClass                    string      `xml:"t:ItemClass"`
-	Subject     string
-	Sensitivity Sensitivity
-	Body        Body
-	// Attachments                  string      `xml:"t:Attachments"`
-	// DateTimeReceived             string      `xml:"t:DateTimeReceived"`
-	// Size                         string      `xml:"t:Size"`
-	// Categories                   string      `xml:"t:Categories"`
-	// InReplyTo                    string      `xml:"t:InReplyTo"`
-	// IsSubmitted                  string      `xml:"t:IsSubmitted"`
-	// IsDraft                      string      `xml:"t:IsDraft"`
-	// IsFromMe                     string      `xml:"t:IsFromMe"`
-	// IsResend                     string      `xml:"t:IsResend"`
-	// IsUnmodified                 string      `xml:"t:IsUnmodified"`
-	// InternetMessageHeaders       string      `xml:"t:InternetMessageHeaders"`
-	// DateTimeSent                 string      `xml:"t:DateTimeSent"`
-	// DateTimeCreated              string      `xml:"t:DateTimeCreated"`
-	// ResponseObjects              string      `xml:"t:ResponseObjects"`
-	// ReminderDueBy                string      `xml:"t:ReminderDueBy"`
-	ReminderIsSet              bool
-	ReminderMinutesBeforeStart int
-	DisplayCc                  ConcatenatedString
-	DisplayTo                  ConcatenatedString
-	HasAttachments             bool
-	// ExtendedProperty             string      `xml:"t:ExtendedProperty"`
-	// Culture                      string      `xml:"t:Culture"`
+	// MimeContent                  string
+	ItemId         *ItemId `xml:",omitempty"`
+	ParentFolderId *ItemId `xml:",omitempty"`
+	// ItemClass                    string
+	Subject string
+	// Sensitivity *Sensitivity
+	Body *Body `xml:",omitempty"`
+	// Attachments                  string
+	// DateTimeReceived             string
+	// Size                         string
+	// Categories                   string
+	// InReplyTo                    string
+	// IsSubmitted                  string
+	// IsDraft                      string
+	// IsFromMe                     string
+	// IsResend                     string
+	// IsUnmodified                 string
+	// InternetMessageHeaders       string
+	// DateTimeSent                 string
+	// DateTimeCreated              string
+	// ResponseObjects              string
+	// ReminderDueBy                string
+	ReminderIsSet              bool               `xml:",omitempty"`
+	ReminderMinutesBeforeStart Minutes            `xml:",omitempty"`
+	DisplayCc                  ConcatenatedString `xml:",omitempty"`
+	DisplayTo                  ConcatenatedString `xml:",omitempty"`
+	// HasAttachments             bool
+	// ExtendedProperty             string
+	// Culture                      string
 	Start time.Time
 	End   time.Time
-	// OriginalStart                string      `xml:"t:OriginalStart"`
+	// OriginalStart                string
 	IsAllDayEvent        bool
-	LegacyFreeBusyStatus LegacyFreeBusyStatus
-	Location             string
-	// When                         string      `xml:"t:When"`
-	// IsMeeting                    string      `xml:"t:IsMeeting"`
-	// IsCancelled                  string      `xml:"t:IsCancelled"`
-	// IsRecurring                  string      `xml:"t:IsRecurring"`
-	// MeetingRequestWasSent        string      `xml:"t:MeetingRequestWasSent"`
-	// IsResponseRequested          string      `xml:"t:IsResponseRequested"`
-	CalendarItemType CalendarItemType
-	// MyResponseType               string      `xml:"t:MyResponseType"`
-	Organizer         OneMailbox
-	RequiredAttendees []Attendee // []Attendees
-	OptionalAttendees []Attendee // []Attendees
-	Resources         []Attendee // []Attendees
-	// ConflictingMeetingCount      string      `xml:"t:ConflictingMeetingCount"`
-	// AdjacentMeetingCount         string      `xml:"t:AdjacentMeetingCount"`
-	// ConflictingMeetings          string      `xml:"t:ConflictingMeetings"`
-	// AdjacentMeetings             string      `xml:"t:AdjacentMeetings"`
-	// Duration                     string      `xml:"t:Duration"`
-	// TimeZone                     string      `xml:"t:TimeZone"`
-	// AppointmentReplyTime         string      `xml:"t:AppointmentReplyTime"`
-	// AppointmentSequenceNumber    string      `xml:"t:AppointmentSequenceNumber"`
-	// AppointmentState             string      `xml:"t:AppointmentState"`
-	// Recurrence                   string      `xml:"t:Recurrence"`
-	// FirstOccurrence              string      `xml:"t:FirstOccurrence"`
-	// LastOccurrence               string      `xml:"t:LastOccurrence"`
-	// ModifiedOccurrences          string      `xml:"t:ModifiedOccurrences"`
-	// DeletedOccurrences           string      `xml:"t:DeletedOccurrences"`
-	// MeetingTimeZone              string      `xml:"t:MeetingTimeZone"`
-	// StartTimeZone                string      `xml:"t:StartTimeZone"`
-	// EndTimeZone                  string      `xml:"t:EndTimeZone"`
-	// ConferenceType               string      `xml:"t:ConferenceType"`
-	// AllowNewTimeProposal         string      `xml:"t:AllowNewTimeProposal"`
-	// IsOnlineMeeting              string      `xml:"t:IsOnlineMeeting"`
-	// MeetingWorkspaceUrl          string      `xml:"t:MeetingWorkspaceUrl"`
-	// NetShowUrl                   string      `xml:"t:NetShowUrl"`
-	// EffectiveRights              string      `xml:"t:EffectiveRights"`
-	// LastModifiedName             string      `xml:"t:LastModifiedName"`
-	// LastModifiedTime             string      `xml:"t:LastModifiedTime"`
-	IsAssociated bool
-	// WebClientReadFormQueryString string      `xml:"t:WebClientReadFormQueryString"`
-	// WebClientEditFormQueryString string      `xml:"t:WebClientEditFormQueryString"`
-	// ConversationId               string      `xml:"t:ConversationId"`
-	// UniqueBody                   string      `xml:"t:UniqueBody"`
+	LegacyFreeBusyStatus *LegacyFreeBusyStatus `xml:",omitempty"`
+	Location             *string               `xml:",omitempty"`
+	// When                         string
+	// IsMeeting                    string
+	// IsCancelled                  string
+	// IsRecurring                  string
+	// MeetingRequestWasSent        string
+	// IsResponseRequested          string
+	CalendarItemType CalendarItemType `xml:",omitempty"`
+	// MyResponseType               string
+	Organizer         *Mailbox   `xml:"Organizer>Mailbox,omitempty"`
+	RequiredAttendees *Attendees `xml:",omitempty"`
+	OptionalAttendees *Attendees `xml:",omitempty"`
+	// Resources         []Attendee // []Attendees
+	// ConflictingMeetingCount      string
+	// AdjacentMeetingCount         string
+	// ConflictingMeetings          string
+	// AdjacentMeetings             string
+	// Duration                     string
+	// TimeZone                     string
+	// AppointmentReplyTime         string
+	// AppointmentSequenceNumber    string
+	// AppointmentState             string
+	// Recurrence                   string
+	// FirstOccurrence              string
+	// LastOccurrence               string
+	// ModifiedOccurrences          string
+	// DeletedOccurrences           string
+	// MeetingTimeZone              string
+	// StartTimeZone                string
+	// EndTimeZone                  string
+	// ConferenceType               string
+	// AllowNewTimeProposal         string
+	// IsOnlineMeeting              string
+	// MeetingWorkspaceUrl          string
+	// NetShowUrl                   string
+	// EffectiveRights              string
+	// LastModifiedName             string
+	// LastModifiedTime             string
+	// IsAssociated bool
+	// WebClientReadFormQueryString string
+	// WebClientEditFormQueryString string
+	// ConversationId               string
+	// UniqueBody                   string
 }
 
-// ConcatenatedString represents the concatenated display string that is used
-// for the contents of the element. Each part represents its own value.
-// https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/displaycc
-// https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/displayto
-type ConcatenatedString string
-
-func (c ConcatenatedString) Split(sep string) []string {
-	return strings.Split(string(c), sep)
+func (ci *CalendarItem) SetReminder(d time.Duration) {
+	ci.ReminderIsSet = true
+	ci.ReminderMinutesBeforeStart = Minutes(d)
 }
-
-func (s ConcatenatedString) String() string { return string(s) }

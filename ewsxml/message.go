@@ -1,60 +1,85 @@
 package ewsxml
 
-// https://docs.microsoft.com/en-us/exchange/client-developer/web-service-reference/message-ex15websvcsotherref
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/message-ex15websvcsotherref
 type Message struct {
-	// MimeContent string `xml:"t:MimeContent"`
-	// ItemId         ItemId         `xml:"t:ItemId"`
-	// ParentFolderId ParentFolderId `xml:"t:ParentFolderId"`
-	ItemClass   string      `xml:"t:ItemClass"`
-	Subject     string      `xml:"t:Subject"`
-	Sensitivity Sensitivity `xml:"t:Sensitivity"`
-	Body        Body        `xml:"t:Body"`
-	// Attachments                  string      `xml:"t:Attachments"`
-	// DateTimeReceived             string      `xml:"t:DateTimeReceived"`
-	// Size                         string      `xml:"t:Size"`
-	// Categories                   string      `xml:"t:Categories"`
-	// Importance                   string      `xml:"t:Importance"`
-	// InReplyTo                    string      `xml:"t:InReplyTo"`
-	// IsSubmitted                  string      `xml:"t:IsSubmitted"`
-	// IsDraft                      string      `xml:"t:IsDraft"`
-	// IsFromMe                     string      `xml:"t:IsFromMe"`
-	// IsResend                     string      `xml:"t:IsResend"`
-	// IsUnmodified                 string      `xml:"t:IsUnmodified"`
-	// InternetMessageHeaders       string      `xml:"t:InternetMessageHeaders"`
-	// DateTimeSent                 string      `xml:"t:DateTimeSent"`
-	// DateTimeCreated              string      `xml:"t:DateTimeCreated"`
-	// ResponseObjects              string      `xml:"t:ResponseObjects"`
-	// ReminderDueBy                string      `xml:"t:ReminderDueBy"`
-	// ReminderIsSet                string      `xml:"t:ReminderIsSet"`
-	// ReminderMinutesBeforeStart   string      `xml:"t:ReminderMinutesBeforeStart"`
-	// DisplayCc                    string      `xml:"t:DisplayCc"`
-	// DisplayTo                    string      `xml:"t:DisplayTo"`
-	// HasAttachments               string      `xml:"t:HasAttachments"`
-	// ExtendedProperty             string      `xml:"t:ExtendedProperty"`
-	// Culture                      string      `xml:"t:Culture"`
-	Sender       OneMailbox `xml:"t:Sender"`
-	ToRecipients []Mailbox  `xml:"t:ToRecipients"`
-	// CcRecipients                 string      `xml:"t:CcRecipients"`
-	// BccRecipients                string      `xml:"t:BccRecipients"`
-	// IsReadReceiptRequested       string      `xml:"t:IsReadReceiptRequested"`
-	// IsDeliveryReceiptRequested   string      `xml:"t:IsDeliveryReceiptRequested"`
-	// ConversationIndex            string      `xml:"t:ConversationIndex"`
-	// ConversationTopic            string      `xml:"t:ConversationTopic"`
-	// From                         string      `xml:"t:From"`
-	// InternetMessageId            string      `xml:"t:InternetMessageId"`
-	// IsRead                       string      `xml:"t:IsRead"`
-	// IsResponseRequested          string      `xml:"t:IsResponseRequested"`
-	// References                   string      `xml:"t:References"`
-	// ReplyTo                      string      `xml:"t:ReplyTo"`
-	// EffectiveRights              string      `xml:"t:EffectiveRights"`
-	// ReceivedBy                   string      `xml:"t:ReceivedBy"`
-	// ReceivedRepresenting         string      `xml:"t:ReceivedRepresenting"`
-	// LastModifiedName             string      `xml:"t:LastModifiedName"`
-	// LastModifiedTime             string      `xml:"t:LastModifiedTime"`
-	// IsAssociated                 string      `xml:"t:IsAssociated"`
-	// WebClientReadFormQueryString string      `xml:"t:WebClientReadFormQueryString"`
-	// WebClientEditFormQueryString string      `xml:"t:WebClientEditFormQueryString"`
-	// ConversationId               string      `xml:"t:ConversationId"`
-	// UniqueBody                   string      `xml:"t:UniqueBody"`
-	// ReminderMessageData          string      `xml:"t:ReminderMessageData"`
+	// MimeContent string
+	// ItemId         ItemId
+	// ParentFolderId ParentFolderId
+	ItemClass   string
+	Subject     string
+	Sensitivity Sensitivity
+	Body        Body
+	// Attachments                  string
+	// DateTimeReceived             string
+	// Size                         string
+	// Categories                   string
+	// Importance                   string
+	// InReplyTo                    string
+	// IsSubmitted                  string
+	// IsDraft                      string
+	// IsFromMe                     string
+	// IsResend                     string
+	// IsUnmodified                 string
+	// InternetMessageHeaders       string
+	// DateTimeSent                 string
+	// DateTimeCreated              string
+	// ResponseObjects              string
+	// ReminderDueBy                string
+	// ReminderIsSet                string
+	// ReminderMinutesBeforeStart   string
+	// DisplayCc                    string
+	// DisplayTo                    string
+	// HasAttachments               string
+	// ExtendedProperty             string
+	// Culture                      string
+	Sender       Mailbox `xml:"Sender>Mailbox"`
+	ToRecipients []Mailbox
+	// CcRecipients                 string
+	// BccRecipients                string
+	// IsReadReceiptRequested       string
+	// IsDeliveryReceiptRequested   string
+	// ConversationIndex            string
+	// ConversationTopic            string
+	// From                         string
+	// InternetMessageId            string
+	// IsRead                       string
+	// IsResponseRequested          string
+	// References                   string
+	// ReplyTo                      string
+	// EffectiveRights              string
+	// ReceivedBy                   string
+	// ReceivedRepresenting         string
+	// LastModifiedName             string
+	// LastModifiedTime             string
+	// IsAssociated                 string
+	// WebClientReadFormQueryString string
+	// WebClientEditFormQueryString string
+	// ConversationId               string
+	// UniqueBody                   string
+	// ReminderMessageData          string
+}
+
+// The BodyType element identifies how the body text is formatted in the
+// response.
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/bodytype
+type BodyType string
+
+func (s BodyType) String() string { return string(s) }
+
+// The Body element specifies the body of an item.
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/body
+type Body struct {
+	BodyType    BodyType `xml:",attr"`
+	IsTruncated bool     `xml:",attr"`
+	Contents    []byte   `xml:",chardata"`
+}
+
+func (b *Body) Html(contents []byte) {
+	b.BodyType = BodyType_HTML
+	b.Contents = contents
+}
+
+func (b *Body) Text(contents []byte) {
+	b.BodyType = BodyType_Text
+	b.Contents = contents
 }
