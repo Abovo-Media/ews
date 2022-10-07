@@ -17,8 +17,8 @@ const (
 	// request was processing and subsequent items could not be processed.
 	ResponseClass_Warning ResponseClass = "Warning"
 	// ResponseClass_Error describes a request that cannot be fulfilled.
-	// Information about the error can be found in the Response.ResponseCode
-	// and Response.MessageText elements.
+	// Information about the error can be found in the ResponseMessage.ResponseCode
+	// and ResponseMessage.MessageText elements.
 	ResponseClass_Error ResponseClass = "Error"
 )
 
@@ -29,8 +29,12 @@ type ResponseEnvelope struct {
 	}
 }
 
+type Response interface {
+	Response() *ResponseMessage
+}
+
 // https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/responsemessage
-type Response struct {
+type ResponseMessage struct {
 	ResponseClass ResponseClass `xml:",attr"`
 	// The MessageText element provides a text description of the status of the
 	// response.
@@ -40,7 +44,9 @@ type Response struct {
 	MessageXml   MessageXml
 }
 
-func (r Response) String() string { return r.MessageText }
+func (r *ResponseMessage) Response() *ResponseMessage { return r }
+
+func (r ResponseMessage) String() string { return r.MessageText }
 
 type MessageXml struct {
 	ExceptionType       string

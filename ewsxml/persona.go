@@ -1,5 +1,14 @@
 package ewsxml
 
+import (
+	"encoding/xml"
+)
+
+type GetPersona struct {
+	XMLName   xml.Name  `xml:"m:GetPersona"`
+	PersonaId PersonaId `xml:"m:PersonaId"`
+}
+
 type Persona struct {
 	PersonaId            PersonaId
 	DisplayName          string

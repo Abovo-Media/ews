@@ -16,13 +16,18 @@ type GetRoomListsOperation struct {
 }
 
 type GetRoomListsResponse struct {
-	ewsxml.Response
+	ewsxml.ResponseMessage
 	RoomLists struct {
 		Address []ewsxml.Mailbox `xml:"Address"`
 	} `xml:"RoomLists"`
 }
 
+const OpGetRoomLists Operation = "GetRoomLists"
+
 func GetRoomLists(ctx context.Context, req ews.Requester, op *GetRoomListsOperation) (*GetRoomListsResponse, error) {
 	var out GetRoomListsResponse
-	return &out, req.Request(ews.NewRequest(ctx, &op.Header, op.body), &out)
+	return &out, req.Request(
+		ews.NewRequest(setOperation(ctx, OpGetRoomLists), &op.Header, op.body),
+		&out,
+	)
 }

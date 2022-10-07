@@ -12,12 +12,8 @@ type FindItemCalendarViewOperation struct {
 	Header   ewsxml.Header
 	FindItem struct {
 		ewsxml.FindItem
-		CalendarView ewsxml.CalendarView
-
-		// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/parentfolderids
-		ParentFolderIds struct {
-			DistinguishedFolderId ewsxml.DistinguishedFolderId
-		} `xml:"m:ParentFolderIds"`
+		CalendarView    ewsxml.CalendarView
+		ParentFolderIds ewsxml.ParentFolderIds
 	}
 }
 
@@ -28,7 +24,15 @@ type FindItemCalendarViewResponse struct {
 	}
 }
 
+func (r *FindItemCalendarViewResponse) Response() *ewsxml.ResponseMessage {
+	return r.ResponseMessages.FindItemResponseMessage.Response()
+}
+
+const OpGetCalendars Operation = "GetCalendars"
+
 func GetCalendars(ctx context.Context, req ews.Requester, op *FindItemCalendarViewOperation) (*FindItemCalendarViewResponse, error) {
+	ctx = setOperation(ctx, OpGetCalendars)
+
 	if op.FindItem.Traversal == "" {
 		op.FindItem.Traversal = ewsxml.Traversal_Shallow
 	}

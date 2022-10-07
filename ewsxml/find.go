@@ -98,7 +98,7 @@ type CalendarView struct {
 // single FindItem operation request.
 // https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/finditemresponsemessage
 type FindItemResponseMessage struct {
-	Response
+	ResponseMessage
 	DescriptiveLinkKey int `xml:",attr"`
 	RootFolder         RootFolder
 }

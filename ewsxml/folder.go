@@ -4,6 +4,12 @@ import (
 	"encoding/xml"
 )
 
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/parentfolderids
+type ParentFolderIds struct {
+	XMLName               xml.Name `xml:"m:ParentFolderIds"`
+	DistinguishedFolderId DistinguishedFolderId
+}
+
 // The FolderId element contains the identifier and change key of a folder
 // https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/folderid
 type FolderId struct {
@@ -16,11 +22,26 @@ type FolderId struct {
 // identify a folder.
 // https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/distinguishedfolderid
 type DistinguishedFolderId struct {
-	Id      string   `xml:",attr,omitempty"`
-	Mailbox *Mailbox `xml:",omitempty"`
+	Id        string   `xml:",attr"`
+	ChangeKey string   `xml:",attr,omitempty"`
+	Mailbox   *Mailbox `xml:",omitempty"`
 }
 
-func NewDistinguishedFolderId(mb *Mailbox) *DistinguishedFolderId {
+func (d *DistinguishedFolderId) WithId(s string) {
+	if d == nil {
+		x := DistinguishedFolderId{}
+		*d = x
+	}
+	d.Id = s
+}
+
+// func (d *DistinguishedFolderId) WithMailbox(mb *Mailbox) {
+// 	if d == nil {
+// 		*d = new(DistinguishedFolderId)
+// 	}
+// }
+
+func NewDistinguishedFolderIdWithMailbox(mb *Mailbox) *DistinguishedFolderId {
 	return &DistinguishedFolderId{Mailbox: mb}
 }
 

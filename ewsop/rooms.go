@@ -15,7 +15,7 @@ type GetRoomsOperation struct {
 
 // https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/getroomsresponse
 type GetRoomsResponse struct {
-	ewsxml.Response
+	ewsxml.ResponseMessage
 	Rooms []struct {
 		Name         string
 		EmailAddress string
@@ -24,7 +24,12 @@ type GetRoomsResponse struct {
 	} `xml:"Rooms>Room>Id"`
 }
 
+const OpGetRooms Operation = "GetRooms"
+
 func GetRooms(ctx context.Context, req ews.Requester, op *GetRoomsOperation) (*GetRoomsResponse, error) {
 	var out GetRoomsResponse
-	return &out, req.Request(ews.NewRequest(ctx, &op.Header, op.GetRooms), &out)
+	return &out, req.Request(
+		ews.NewRequest(setOperation(ctx, OpGetRooms), &op.Header, op.GetRooms),
+		&out,
+	)
 }

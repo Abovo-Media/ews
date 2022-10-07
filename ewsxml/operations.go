@@ -4,11 +4,6 @@ import (
 	"encoding/xml"
 )
 
-type GetPersona struct {
-	XMLName   xml.Name  `xml:"m:GetPersona"`
-	PersonaId PersonaId `xml:"m:PersonaId"`
-}
-
 type GetRooms struct {
 	XMLName  xml.Name `xml:"m:GetRooms"`
 	RoomList struct {

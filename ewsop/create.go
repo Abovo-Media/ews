@@ -14,14 +14,18 @@ type CreateItemOperation struct {
 
 type CreateItemResponse struct {
 	ResponseMessages []struct {
-		ewsxml.Response
+		ewsxml.ResponseMessage
 		CalendarItems []struct {
 			ItemId ewsxml.ItemId
 		} `xml:"Items>CalendarItem"`
 	} `xml:"ResponseMessages>CreateItemResponseMessage"`
 }
 
+const OpCreateCalendarItem Operation = "CreateCalendarItem"
+
 func CreateCalendarItem(ctx context.Context, req ews.Requester, op *CreateItemOperation, ci ...ewsxml.CalendarItem) (*CreateItemResponse, error) {
+	ctx = setOperation(ctx, OpCreateCalendarItem)
+
 	if op == nil {
 		op = new(CreateItemOperation)
 	}

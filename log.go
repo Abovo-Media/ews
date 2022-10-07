@@ -1,6 +1,7 @@
 package ews
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -10,13 +11,14 @@ import (
 
 type Logger interface {
 	LogClientStart(url string, ver Version)
-	LogHttpRequest(req *http.Request, body []byte)
-	LogHttpResponse(resp *http.Response)
-	LogResponse(resp ewsxml.Response)
+	LogHttpRequest(ctx context.Context, req *http.Request, body []byte)
+	LogHttpResponse(ctx context.Context, resp *http.Response)
+	LogResponse(ctx context.Context, resp ewsxml.ResponseMessage)
 }
 
 func DefaultLogger() Logger { return new(logger) }
-func NopLogger() Logger     { return new(nopLogger) }
+
+func NopLogger() Logger { return new(nopLogger) }
 
 type logger struct{}
 
@@ -24,7 +26,7 @@ func (l *logger) LogClientStart(url string, ver Version) {
 	log.Println("EWS LogClientStart:", url, ver)
 }
 
-func (l *logger) LogHttpRequest(req *http.Request, body []byte) {
+func (l *logger) LogHttpRequest(ctx context.Context, req *http.Request, body []byte) {
 	dump, err := httputil.DumpRequestOut(req, false)
 	if err != nil {
 		log.Println("Dump error:", err)
@@ -33,7 +35,7 @@ func (l *logger) LogHttpRequest(req *http.Request, body []byte) {
 	}
 }
 
-func (l *logger) LogHttpResponse(resp *http.Response) {
+func (l *logger) LogHttpResponse(ctx context.Context, resp *http.Response) {
 	dump, err := httputil.DumpResponse(resp, true)
 	if err != nil {
 		log.Println("Dump error:", err)
@@ -42,16 +44,16 @@ func (l *logger) LogHttpResponse(resp *http.Response) {
 	}
 }
 
-func (l *logger) LogResponse(resp ewsxml.Response) {
+func (l *logger) LogResponse(ctx context.Context, resp ewsxml.ResponseMessage) {
 	if resp.ResponseCode == ewsxml.NoError {
 		return
 	}
 	log.Printf("%s: %s (%s)", resp.ResponseClass, resp.MessageText, resp.ResponseCode)
 }
 
-type nopLogger struct{}
+type nopLogger int
 
-func (_ *nopLogger) LogClientStart(_ string, _ Version)       {}
-func (_ *nopLogger) LogHttpRequest(_ *http.Request, _ []byte) {}
-func (_ *nopLogger) LogHttpResponse(_ *http.Response)         {}
-func (_ *nopLogger) LogResponse(_ ewsxml.Response)            {}
+func (_ *nopLogger) LogClientStart(_ string, _ Version)                          {}
+func (_ *nopLogger) LogHttpRequest(_ context.Context, _ *http.Request, _ []byte) {}
+func (_ *nopLogger) LogHttpResponse(_ context.Context, _ *http.Response)         {}
+func (_ *nopLogger) LogResponse(_ context.Context, _ ewsxml.ResponseMessage)     {}

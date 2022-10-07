@@ -32,10 +32,10 @@ const (
 	// is returned.
 	ContactDataShape_IdOnly
 	// ContactDataShape_Default indicates the Default set of contact item
-	// properties is returned. For more information, see Response shapes in EWS.
+	// properties is returned. For more information, see ResponseMessage shapes in EWS.
 	ContactDataShape_Default
 	// ContactDataShape_AllProperties indicates the AllProperties set of
-	// contact item properties are returned.For more information, see Response
+	// contact item properties are returned.For more information, see ResponseMessage
 	// shapes in EWS.
 	ContactDataShape_AllProperties
 )

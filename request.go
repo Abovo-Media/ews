@@ -2,21 +2,25 @@ package ews
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/xml"
 	"io"
+	"strconv"
+	"sync/atomic"
 
 	"github.com/Abovo-Media/go-ews/ewsxml"
 	"github.com/go-pogo/errors"
 	"github.com/go-pogo/writing"
 )
 
+const PanicNilBody = "body must be a non-nil value"
+
 type Request struct {
 	ctx  context.Context
 	head *ewsxml.Header
 	body interface{}
 }
-
-const PanicNilBody = "body must be a non-nil value"
 
 func NewRequest(ctx context.Context, head *ewsxml.Header, body interface{}) *Request {
 	if ctx == nil {
@@ -30,7 +34,7 @@ func NewRequest(ctx context.Context, head *ewsxml.Header, body interface{}) *Req
 	}
 
 	return &Request{
-		ctx:  ctx,
+		ctx:  context.WithValue(ctx, requestIdKey{}, genRequestId()),
 		head: head,
 		body: body,
 	}
@@ -81,4 +85,27 @@ func (r *Request) WriteTo(w io.Writer) (int64, error) {
 
 	_, _ = cw.Write(soapEnd)
 	return int64(cw.Count()), errors.Combine(cw.Errors()...)
+}
+
+type (
+	requestIdKey struct{}
+	attemptKey   struct{}
+)
+
+func RequestId(ctx context.Context) (string, bool) {
+	v, ok := ctx.Value(requestIdKey{}).(string)
+	return v, ok
+}
+
+func RequestAttempt(ctx context.Context) (uint8, bool) {
+	v, ok := ctx.Value(attemptKey{}).(uint8)
+	return v, ok
+}
+
+var atomicRequestId atomic.Uint64
+
+func genRequestId() string {
+	uid := strconv.FormatUint(atomicRequestId.Add(1), 10)
+	h := md5.Sum([]byte(uid))
+	return hex.EncodeToString(h[:])
 }

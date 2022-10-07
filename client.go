@@ -1,15 +1,16 @@
 package ews
 
 import (
-	"bytes"
+	"context"
 	"encoding/xml"
+	"fmt"
 	"io/ioutil"
 	"net/http"
-	"sync"
 	"time"
 
 	"github.com/Abovo-Media/go-ews/ewsxml"
 	"github.com/go-pogo/errors"
+	"github.com/go-pogo/writing"
 )
 
 type Version = ewsxml.Version
@@ -39,16 +40,24 @@ type Client interface {
 	Do(req *Request) (*http.Response, error)
 }
 
-func NewClient(url string, ver Version, opts ...Option) (Client, error) {
+type client struct {
+	log  Logger
+	http *http.Client
+	conf Config
+	auth [2]string
+}
+
+func NewClient(conf Config, opts ...Option) (Client, error) {
+	conf.defaults()
+
 	c := &client{
-		log: NopLogger(),
-		ver: ver,
-		url: url,
+		log:  NopLogger(),
+		conf: conf,
 		http: &http.Client{
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
 				return http.ErrUseLastResponse
 			},
-			Timeout: time.Second * 10,
+			Timeout: conf.Timeout,
 		},
 	}
 
@@ -57,32 +66,25 @@ func NewClient(url string, ver Version, opts ...Option) (Client, error) {
 		errors.Append(&err, opt(c))
 	}
 
-	c.log.LogClientStart(url, ver)
+	c.log.LogClientStart(c.conf.Url, c.conf.Version)
 	return c, err
-}
-
-type client struct {
-	log    Logger
-	http   *http.Client
-	ver    Version
-	url    string
-	auth   [2]string
-	header ewsxml.Header
 }
 
 func (c *client) Log() Logger { return c.log }
 
-func (c *client) Url() string { return c.url }
+func (c *client) Url() string { return c.conf.Url }
 
 func (c *client) Username() string { return c.auth[0] }
 
+var bufPool = writing.NewBytesBufferPool(512)
+
 func (c *client) Do(req *Request) (*http.Response, error) {
 	if req.head.RequestServerVersion.Version == "" {
-		req.head.ServerVersion(c.ver)
+		req.head.ServerVersion(c.conf.Version)
 	}
 
-	body := getBuffer()
-	defer releaseBuffer(body)
+	body := bufPool.Get()
+	defer bufPool.Put(body)
 	if _, err := req.WriteTo(body); err != nil {
 		return nil, err
 	}
@@ -97,59 +99,93 @@ func (c *client) Do(req *Request) (*http.Response, error) {
 			httpReq.SetBasicAuth(c.auth[0], c.auth[1])
 		}
 	}
-	httpReq.Header.Set("Content-Type", "text/xml")
 
-	c.log.LogHttpRequest(httpReq, body.Bytes())
-	return c.http.Do(httpReq)
+	httpReq.Header.Set("Content-Type", "text/xml")
+	c.log.LogHttpRequest(req.ctx, httpReq, body.Bytes())
+
+	var httpResp *http.Response
+	var attempt uint8
+
+	for {
+		attempt++
+		httpResp, err = c.do(context.WithValue(req.ctx, attemptKey{}, attempt), httpReq)
+		if err == nil && httpResp.StatusCode == http.StatusOK {
+			return httpResp, nil
+		}
+		if attempt >= c.conf.Retries {
+			break
+		}
+		time.Sleep(time.Second * time.Duration(attempt*attempt/2))
+	}
+	return httpResp, err
+}
+
+func (c *client) do(ctx context.Context, req *http.Request) (*http.Response, error) {
+	// todo: record metrics
+	resp, err := c.http.Do(req)
+
+	if err != nil {
+		return nil, errors.WithKind(err, RequestError)
+	}
+
+	c.log.LogHttpResponse(ctx, resp)
+	return resp, nil
 }
 
 func (c *client) Request(req *Request, out interface{}) (err error) {
-	resp, err := c.Do(req)
+	httpResp, err := c.Do(req)
 	if err != nil {
 		return err
 	}
 
-	defer errors.AppendFunc(&err, resp.Body.Close)
-	c.log.LogHttpResponse(resp)
-
-	if resp.StatusCode != http.StatusOK {
-		errors.Append(&err, NewError(resp))
+	defer errors.AppendFunc(&err, httpResp.Body.Close)
+	if httpResp.StatusCode != http.StatusOK {
+		errors.Append(&err, NewError(httpResp))
 		return err
 	}
 
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := ioutil.ReadAll(httpResp.Body)
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
-	var x ewsxml.ResponseEnvelope
-	if err = xml.Unmarshal(data, &x); err != nil {
+	var resp ewsxml.ResponseEnvelope
+	if err = xml.Unmarshal(data, &resp); err != nil {
 		return errors.WithKind(err, UnmarshalError)
 	}
 
 	if b, ok := out.(*[]byte); ok {
 		// skip unmarshalling, return as raw bytes
-		*b = x.Body.Response
+		*b = resp.Body.Response
 		return nil
 	}
 
-	return errors.WithKind(xml.Unmarshal(x.Body.Response, out), UnmarshalError)
+	// unmarshal raw response into the expected result
+	if err = xml.Unmarshal(resp.Body.Response, out); err != nil {
+		return errors.WithKind(err, UnmarshalError)
+	}
+	if resp, ok := out.(ewsxml.Response); ok {
+		c.log.LogResponse(req.ctx, *resp.Response())
+		if err = newResponseError(resp.Response()); err != nil {
+			return errors.WithStack(err)
+		}
+	}
+
+	return nil
 }
 
-var bufPool = sync.Pool{
-	New: func() interface{} {
-		var buf bytes.Buffer
-		// len(soapStart) + len(soapBodyStart) + len(soapEnd) = 347
-		buf.Grow(512)
-		return &buf
-	},
+type ResponseError struct {
+	Response ewsxml.Response
 }
 
-func getBuffer() *bytes.Buffer {
-	return bufPool.Get().(*bytes.Buffer)
+func newResponseError(resp ewsxml.Response) error {
+	if resp.Response().ResponseClass != ewsxml.ResponseClass_Error {
+		return nil
+	}
+	return &ResponseError{Response: resp}
 }
 
-func releaseBuffer(b *bytes.Buffer) {
-	b.Reset()
-	bufPool.Put(b)
+func (re *ResponseError) Error() string {
+	r := re.Response.Response()
+	return fmt.Sprintf("response error: %s: %s", r.ResponseCode, r.MessageText)
 }

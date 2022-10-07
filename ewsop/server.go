@@ -3,7 +3,7 @@ package ewsop
 import (
 	"context"
 
-	"github.com/Abovo-Media/go-ews"
+	ews "github.com/Abovo-Media/go-ews"
 	"github.com/Abovo-Media/go-ews/ewsxml"
 )
 
@@ -12,14 +12,17 @@ type GetServerTimeZonesOperation struct {
 	GetServerTimeZones ewsxml.GetServerTimeZones
 }
 
+// todo: finish response
 type GetServerTimeZonesResponse struct {
-	ewsxml.Response
-	RoomLists struct {
-		Address []ewsxml.Mailbox `xml:"Address"`
-	} `xml:"RoomLists"`
+	ewsxml.ResponseMessage
 }
+
+const OpGetServerTimeZones Operation = "GetServerTimeZones"
 
 func GetServerTimeZones(ctx context.Context, req ews.Requester, op *GetServerTimeZonesOperation) (*GetServerTimeZonesResponse, error) {
 	var out GetServerTimeZonesResponse
-	return &out, req.Request(ews.NewRequest(ctx, &op.Header, &op.GetServerTimeZones), &out)
+	return &out, req.Request(
+		ews.NewRequest(setOperation(ctx, OpGetServerTimeZones), &op.Header, &op.GetServerTimeZones),
+		&out,
+	)
 }
