@@ -21,7 +21,7 @@ func (s LegacyFreeBusyStatus) String() string { return string(s) }
 // https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/calendaritemtype
 type CalendarItemType string
 
-func (s Sensitivity) CalendarItemType() string { return string(s) }
+func (s CalendarItemType) String() string { return string(s) }
 
 //goland:noinspection GoUnusedConst,GoSnakeCaseUsage
 const (
