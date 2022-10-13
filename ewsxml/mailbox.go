@@ -49,7 +49,7 @@ type Mailbox struct {
 	ItemId       *ItemId     `xml:",omitempty"`
 }
 
-func EmailAddress(email string) *Mailbox {
+func EmailMailbox(email string) *Mailbox {
 	return &Mailbox{EmailAddress: email}
 }
 
@@ -77,7 +77,7 @@ func NewAttendees(a ...Attendee) *Attendees {
 
 func (a *Attendees) AddEmailAddress(email ...string) *Attendees {
 	for _, e := range email {
-		a.Attendee = append(a.Attendee, Attendee{Mailbox: *EmailAddress(e)})
+		a.Attendee = append(a.Attendee, Attendee{Mailbox: *EmailMailbox(e)})
 	}
 	return a
 }

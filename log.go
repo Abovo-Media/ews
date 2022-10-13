@@ -53,7 +53,7 @@ func (l *logger) LogResponse(ctx context.Context, resp ewsxml.ResponseMessage) {
 
 type nopLogger int
 
-func (_ *nopLogger) LogClientStart(_ string, _ Version)                          {}
-func (_ *nopLogger) LogHttpRequest(_ context.Context, _ *http.Request, _ []byte) {}
-func (_ *nopLogger) LogHttpResponse(_ context.Context, _ *http.Response)         {}
-func (_ *nopLogger) LogResponse(_ context.Context, _ ewsxml.ResponseMessage)     {}
+func (*nopLogger) LogClientStart(string, Version)                        {}
+func (*nopLogger) LogHttpRequest(context.Context, *http.Request, []byte) {}
+func (*nopLogger) LogHttpResponse(context.Context, *http.Response)       {}
+func (*nopLogger) LogResponse(context.Context, ewsxml.ResponseMessage)   {}
