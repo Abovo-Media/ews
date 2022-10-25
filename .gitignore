@@ -1,2 +1,4 @@
-.idea
-*.iml
+/.idea
+/vendor
+*.exe
+coverage.out
