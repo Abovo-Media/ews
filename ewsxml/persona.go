@@ -12,6 +12,8 @@ type GetPersona struct {
 type Persona struct {
 	PersonaId            PersonaId
 	DisplayName          string
+	GivenName            string
+	Surname              string
 	Title                string
 	Department           string
 	Departments          Departments
