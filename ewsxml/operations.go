@@ -11,8 +11,9 @@ type GetRooms struct {
 	} `xml:"m:RoomList"`
 }
 
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/getservertimezones
 type GetServerTimeZones struct {
-	XMLName                xml.Name `xml:"m:GetServerTimeZones"`
-	ReturnFullTimeZoneData bool     `xml:",attr"`
-	Ids                    []string `xml:"m:Ids>Id"`
+	XMLName                xml.Name  `xml:"m:GetServerTimeZones"`
+	ReturnFullTimeZoneData bool      `xml:",attr,omitempty"`
+	Ids                    *[]string `xml:"m:Ids>Id,omitempty"`
 }

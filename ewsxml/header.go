@@ -12,24 +12,52 @@ type Header struct {
 	XMLName               xml.Name `xml:"soap:Header"`
 	RequestServerVersion  RequestServerVersion
 	ExchangeImpersonation *ExchangeImpersonation `xml:",omitempty"`
+	TimeZoneContext       *TimeZoneContext       `xml:",omitempty"`
+	DateTimePrecision     DateTimePrecision      `xml:",omitempty"`
 }
 
-func (h *Header) ServerVersion(ver Version) {
+func (h *Header) ServerVersion() Version { return h.RequestServerVersion.Version }
+
+func (h *Header) WithServerVersion(ver Version) *Header {
 	h.RequestServerVersion.Version = ver
+	return h
 }
 
-func (h *Header) DiscardImpersonation() { h.ExchangeImpersonation = nil }
-
-func (h *Header) ImpersonateSmtpAddress(v string) {
-	h.ExchangeImpersonation = &ExchangeImpersonation{
-		ConnectingSID: ConnectingSID{SmtpAddress: v},
-	}
+func (h *Header) DiscardImpersonation() *Header {
+	h.ExchangeImpersonation = nil
+	return h
 }
 
-func (h *Header) ImpersonatePrimarySmtpAddress(v string) {
-	h.ExchangeImpersonation = &ExchangeImpersonation{
-		ConnectingSID: ConnectingSID{PrimarySmtpAddress: v},
+func (h *Header) WithImpersonateSmtpAddress(v string) *Header {
+	if h.ExchangeImpersonation == nil {
+		h.ExchangeImpersonation = new(ExchangeImpersonation)
 	}
+	h.ExchangeImpersonation.ConnectingSID.SmtpAddress = v
+	return h
+}
+
+func (h *Header) WithImpersonatePrimarySmtpAddress(v string) *Header {
+	if h.ExchangeImpersonation == nil {
+		h.ExchangeImpersonation = new(ExchangeImpersonation)
+	}
+	h.ExchangeImpersonation.ConnectingSID.PrimarySmtpAddress = v
+	return h
+}
+
+func (h *Header) DiscardTimeZone() *Header {
+	h.TimeZoneContext = nil
+	return h
+}
+
+func (h *Header) WithTimeZoneId(id string) *Header {
+	if id == "" {
+		return h
+	}
+	if h.TimeZoneContext == nil {
+		h.TimeZoneContext = new(TimeZoneContext)
+	}
+	h.TimeZoneContext.TimeZoneDefinition.Id = id
+	return h
 }
 
 type RequestServerVersion struct {

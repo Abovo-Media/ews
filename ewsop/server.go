@@ -7,14 +7,23 @@ import (
 	"github.com/Abovo-Media/go-ews/ewsxml"
 )
 
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/getservertimezones-operation
 type GetServerTimeZonesOperation struct {
 	Header             ewsxml.Header
 	GetServerTimeZones ewsxml.GetServerTimeZones
 }
 
-// todo: finish response
 type GetServerTimeZonesResponse struct {
-	ewsxml.ResponseMessage
+	ResponseMessages struct {
+		GetServerTimeZonesResponseMessage struct {
+			ewsxml.ResponseMessage
+			TimeZoneDefinitions []ewsxml.TimeZoneDefinition
+		}
+	}
+}
+
+func (r *GetServerTimeZonesResponse) Response() *ewsxml.ResponseMessage {
+	return r.ResponseMessages.GetServerTimeZonesResponseMessage.Response()
 }
 
 const OpGetServerTimeZones Operation = "GetServerTimeZones"

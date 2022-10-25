@@ -6,6 +6,16 @@ import (
 	"time"
 )
 
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/datetimeprecision
+type DateTimePrecision string
+
+func (d DateTimePrecision) String() string { return string(d) }
+
+const (
+	DateTimePrecision_Seconds      DateTimePrecision = "Seconds"
+	DateTimePrecision_Milliseconds DateTimePrecision = "Milliseconds"
+)
+
 type TimeWindow struct {
 	StartTime time.Time `xml:"StartTime"`
 	EndTime   time.Time `xml:"EndTime"`
@@ -26,9 +36,18 @@ type TimeZoneTime struct {
 	Year      string `xml:",omitempty"`
 }
 
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/timezonecontext
+type TimeZoneContext struct {
+	TimeZoneDefinition TimeZoneDefinition
+}
+
+// https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/timezonedefinition
 type TimeZoneDefinition struct {
-	Id   string `xml:",attr"`
-	Name string `xml:",attr"`
+	Id   string `xml:",attr,omitempty"`
+	Name string `xml:",attr,omitempty"`
+	// Periods
+	// TransitionsGroups
+	// Transitions
 }
 
 type Time string

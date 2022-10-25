@@ -79,8 +79,8 @@ func (c *client) Username() string { return c.auth[0] }
 var bufPool = writing.NewBytesBufferPool(512)
 
 func (c *client) Do(req *Request) (*http.Response, error) {
-	if req.head.RequestServerVersion.Version == "" {
-		req.head.ServerVersion(c.conf.Version)
+	if req.head.ServerVersion() == "" {
+		req.head.WithServerVersion(c.conf.Version)
 	}
 
 	body := bufPool.Get()
