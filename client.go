@@ -27,60 +27,55 @@ const (
 
 type Requester interface {
 	// Request
-	// Argument out must be of []byte or any type that xml.Marshal
+	// Argument out must be of type []byte or any type that xml.Marshal
 	// successfully can handle.
 	Request(req *Request, out interface{}) error
 }
 
-type Client interface {
-	Requester
-	Log() Logger
-	Url() string
-	Username() string
-	Do(req *Request) (*http.Response, error)
-}
+type Client struct {
+	Config
 
-type client struct {
 	log  Logger
 	http *http.Client
-	conf Config
-	auth [2]string
 }
 
-func NewClient(conf Config, opts ...Option) (Client, error) {
-	conf.defaults()
-
-	c := &client{
-		log:  NopLogger(),
-		conf: conf,
+func NewClient(url string, ver Version, opts ...Option) (*Client, error) {
+	c := &Client{
+		log: NopLogger(),
 		http: &http.Client{
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
 				return http.ErrUseLastResponse
 			},
-			Timeout: conf.Timeout,
+			Timeout: time.Second * 10,
+		},
+		Config: Config{
+			Url:        url,
+			Version:    ver,
+			Retries:    DefaultRetries,
+			RetrySleep: DefaultRetrySleep,
 		},
 	}
-
-	var err error
-	for _, opt := range opts {
-		errors.Append(&err, opt(c))
+	if err := c.applyOptions(opts); err != nil {
+		return nil, err
 	}
 
-	c.log.LogClientStart(c.conf.Url, c.conf.Version)
-	return c, err
+	c.log.LogClientStart(c.Url, c.Version)
+	return c, nil
 }
 
-func (c *client) Log() Logger { return c.log }
-
-func (c *client) Url() string { return c.conf.Url }
-
-func (c *client) Username() string { return c.auth[0] }
+func (c *Client) applyOptions(opts []Option) error {
+	var err error
+	for _, opt := range opts {
+		errors.Append(&err, opt.apply(c))
+	}
+	return err
+}
 
 var bufPool = writing.NewBytesBufferPool(512)
 
-func (c *client) Do(req *Request) (*http.Response, error) {
+func (c *Client) Do(req *Request) (*http.Response, error) {
 	if req.head.ServerVersion() == "" {
-		req.head.WithServerVersion(c.conf.Version)
+		req.head.WithServerVersion(c.Version)
 	}
 
 	body := bufPool.Get()
@@ -89,14 +84,14 @@ func (c *client) Do(req *Request) (*http.Response, error) {
 		return nil, err
 	}
 
-	httpReq, err := http.NewRequestWithContext(req.ctx, http.MethodPost, c.Url(), body)
+	httpReq, err := http.NewRequestWithContext(req.ctx, http.MethodPost, c.Url, body)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	if c.auth[0] != "" {
+	if c.Username != "" && c.Password != "" {
 		if _, _, has := httpReq.BasicAuth(); !has {
-			httpReq.SetBasicAuth(c.auth[0], c.auth[1])
+			httpReq.SetBasicAuth(c.Username, c.Password)
 		}
 	}
 
@@ -105,6 +100,7 @@ func (c *client) Do(req *Request) (*http.Response, error) {
 
 	var httpResp *http.Response
 	var attempt uint8
+	sleep := c.RetrySleep
 
 	for {
 		attempt++
@@ -112,15 +108,17 @@ func (c *client) Do(req *Request) (*http.Response, error) {
 		if err == nil && httpResp.StatusCode == http.StatusOK {
 			return httpResp, nil
 		}
-		if attempt >= c.conf.Retries {
+		if attempt >= c.Retries {
 			break
 		}
-		time.Sleep(time.Second * time.Duration(attempt*attempt/2))
+
+		time.Sleep(sleep)
+		sleep += sleep
 	}
 	return httpResp, err
 }
 
-func (c *client) do(ctx context.Context, req *http.Request) (*http.Response, error) {
+func (c *Client) do(ctx context.Context, req *http.Request) (*http.Response, error) {
 	// todo: record metrics
 	resp, err := c.http.Do(req)
 
@@ -132,7 +130,7 @@ func (c *client) do(ctx context.Context, req *http.Request) (*http.Response, err
 	return resp, nil
 }
 
-func (c *client) Request(req *Request, out interface{}) (err error) {
+func (c *Client) Request(req *Request, out interface{}) (err error) {
 	httpResp, err := c.Do(req)
 	if err != nil {
 		return err

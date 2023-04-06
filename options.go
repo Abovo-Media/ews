@@ -8,62 +8,130 @@ import (
 	"github.com/Azure/go-ntlmssp"
 )
 
+type Option interface {
+	apply(c *Client) error
+}
+
+type optionFunc func(c *Client) error
+
+func (fn optionFunc) apply(c *Client) error { return fn(c) }
+
+var (
+	DefaultVersion          = Exchange2013
+	DefaultRetries    uint8 = 3
+	DefaultRetrySleep       = time.Second
+)
+
 type Config struct {
-	Url     string
-	Version Version
-	Timeout time.Duration
-	Retries uint8
+	Version    Version
+	Url        string
+	Username   string
+	Password   string
+	Retries    uint8
+	RetrySleep time.Duration
 }
 
-func (c *Config) defaults() {
-	if c.Version == "" {
-		c.Version = Exchange2013
-	}
-	if c.Timeout == 0 {
-		c.Timeout = time.Second * 10
-	}
-	if c.Retries == 0 {
-		c.Retries = 3
-	}
-}
-
-type Option func(c *client) error
-
-func WithLogger(l Logger) Option {
-	return func(c *client) error {
-		if l == nil {
-			c.log = NopLogger()
+func (conf *Config) apply(client *Client) error {
+	if conf.Version != "" {
+		if conf.Version == "" {
+			client.Version = DefaultVersion
 		} else {
-			c.log = l
+			client.Version = conf.Version
 		}
-		return nil
 	}
+	if conf.Url != "" {
+		client.Url = conf.Url
+	}
+	if (conf.Username == "" && conf.Password == "") || (conf.Username != "" && conf.Password != "") {
+		client.Username = conf.Username
+		client.Password = conf.Password
+	}
+	if client.Retries == 0 {
+		if conf.Retries == 0 {
+			client.Retries = DefaultRetries
+		} else {
+			client.Retries = conf.Retries
+		}
+	}
+	if conf.Retries != 0 {
+		client.Retries = conf.Retries
+	}
+	if client.RetrySleep == 0 {
+		if conf.RetrySleep == 0 {
+			client.RetrySleep = DefaultRetrySleep
+		} else {
+			client.RetrySleep = conf.RetrySleep
+		}
+	}
+	return nil
 }
 
-func WithDefaultLogger() Option { return WithLogger(DefaultLogger()) }
+func WithOptions(opts ...Option) Option {
+	return optionFunc(func(c *Client) error {
+		return c.applyOptions(opts)
+	})
+}
+
+func WithTimeout(t time.Duration) Option {
+	return optionFunc(func(c *Client) error {
+		c.http.Timeout = t
+		return nil
+	})
+}
+
+func WithRetries(n uint8) Option {
+	return optionFunc(func(c *Client) error {
+		c.Retries = n
+		return nil
+	})
+}
+
+func WithRetriesAndSleep(retries uint8, sleep time.Duration) Option {
+	return optionFunc(func(c *Client) error {
+		c.Retries = retries
+		c.RetrySleep = sleep
+		return nil
+	})
+}
 
 func WithBasicAuth(user, pass string) Option {
-	return func(c *client) error {
-		c.auth = [2]string{user, pass}
+	return optionFunc(func(c *Client) error {
+		c.Username = user
+		c.Password = pass
 		return nil
-	}
+	})
 }
 
 func WithTransport(t http.RoundTripper) Option {
-	return func(c *client) error {
-		c.http.Transport = t
-		return nil
-	}
+	return withTransport(t, false)
 }
 
 func WithDefaultTransport(skipTls bool) Option {
-	t := http.DefaultTransport
-	if skipTls {
-		t.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	}
-	return WithTransport(t)
+	return withTransport(http.DefaultTransport, skipTls)
 }
 
 func WithNTLM(skipTls bool) Option {
-	return WithTransport(new(ntlmssp.Negotiator))
+	return withTransport(new(ntlmssp.Negotiator), skipTls)
+}
+
+func WithSkipTLS() Option {
+	return optionFunc(func(c *Client) error {
+		if t, ok := c.http.Transport.(*http.Transport); ok {
+			if t.TLSClientConfig == nil {
+				t.TLSClientConfig = new(tls.Config)
+			}
+			t.TLSClientConfig.InsecureSkipVerify = true
+		}
+		return nil
+	})
+}
+
+func withTransport(t http.RoundTripper, skipTls bool) Option {
+	return optionFunc(func(c *Client) error {
+		c.http.Transport = t
+		if !skipTls {
+			return nil
+		}
+		return WithSkipTLS().apply(c)
+	})
 }
