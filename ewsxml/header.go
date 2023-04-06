@@ -49,7 +49,7 @@ func (h *Header) DiscardTimeZone() *Header {
 	return h
 }
 
-func (h *Header) WithTimeZoneId(id string) *Header {
+func (h *Header) WithTimeZoneId(id TimeZoneId) *Header {
 	if id == "" {
 		return h
 	}

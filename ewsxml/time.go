@@ -43,12 +43,14 @@ type TimeZoneContext struct {
 
 // https://learn.microsoft.com/en-us/exchange/client-developer/web-service-reference/timezonedefinition
 type TimeZoneDefinition struct {
-	Id   string `xml:",attr,omitempty"`
-	Name string `xml:",attr,omitempty"`
+	Id   TimeZoneId `xml:",attr,omitempty"`
+	Name string     `xml:",attr,omitempty"`
 	// Periods
 	// TransitionsGroups
 	// Transitions
 }
+
+type TimeZoneId string
 
 type Time string
 
