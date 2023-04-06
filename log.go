@@ -10,50 +10,68 @@ import (
 )
 
 type Logger interface {
-	LogClientStart(url string, ver Version)
-	LogHttpRequest(ctx context.Context, req *http.Request, body []byte)
-	LogHttpResponse(ctx context.Context, resp *http.Response)
-	LogResponse(ctx context.Context, resp ewsxml.ResponseMessage)
+	NewClient(conf Config)
+	HttpRequest(ctx context.Context, req *http.Request, body []byte)
+	HttpResponse(ctx context.Context, resp *http.Response)
+	Response(ctx context.Context, resp ewsxml.ResponseMessage)
 }
 
-func DefaultLogger() Logger { return new(logger) }
-
-func NopLogger() Logger { return new(nopLogger) }
-
-type logger struct{}
-
-func (l *logger) LogClientStart(url string, ver Version) {
-	log.Println("EWS LogClientStart:", url, ver)
+func WithLogger(l Logger) Option {
+	return optionFunc(func(c *Client) error {
+		if l == nil {
+			c.log = NopLogger()
+		} else {
+			c.log = l
+		}
+		return nil
+	})
 }
 
-func (l *logger) LogHttpRequest(ctx context.Context, req *http.Request, body []byte) {
+type DefaultLogger struct {
+	Log *log.Logger
+}
+
+func (l *DefaultLogger) log() *log.Logger {
+	if l.Log == nil {
+		l.Log = log.Default()
+	}
+	return l.Log
+}
+
+func (l *DefaultLogger) NewClient(conf Config) {
+	l.log().Println("EWS NewClient:", conf.Url, conf.Version)
+}
+
+func (l *DefaultLogger) HttpRequest(ctx context.Context, req *http.Request, body []byte) {
 	dump, err := httputil.DumpRequestOut(req, false)
 	if err != nil {
-		log.Println("Dump error:", err)
+		l.log().Println("Dump error:", err)
 	} else {
-		log.Printf("Request:\n%s%s\n----\n", dump, body)
+		l.log().Printf("Request:\n%s%s\n----\n", dump, body)
 	}
 }
 
-func (l *logger) LogHttpResponse(ctx context.Context, resp *http.Response) {
+func (l *DefaultLogger) HttpResponse(ctx context.Context, resp *http.Response) {
 	dump, err := httputil.DumpResponse(resp, true)
 	if err != nil {
-		log.Println("Dump error:", err)
+		l.log().Println("Dump error:", err)
 	} else {
-		log.Printf("LogResponse:\n%s%s\n----\n", dump)
+		l.log().Printf("Response:\n%s%s\n----\n", dump)
 	}
 }
 
-func (l *logger) LogResponse(ctx context.Context, resp ewsxml.ResponseMessage) {
+func (l *DefaultLogger) Response(ctx context.Context, resp ewsxml.ResponseMessage) {
 	if resp.ResponseCode == ewsxml.NoError {
 		return
 	}
-	log.Printf("%s: %s (%s)", resp.ResponseClass, resp.MessageText, resp.ResponseCode)
+	l.log().Printf("%s: %s (%s)", resp.ResponseClass, resp.MessageText, resp.ResponseCode)
 }
 
-type nopLogger int
+func NopLogger() Logger { return new(nopLogger) }
 
-func (*nopLogger) LogClientStart(string, Version)                        {}
-func (*nopLogger) LogHttpRequest(context.Context, *http.Request, []byte) {}
-func (*nopLogger) LogHttpResponse(context.Context, *http.Response)       {}
-func (*nopLogger) LogResponse(context.Context, ewsxml.ResponseMessage)   {}
+type nopLogger struct{}
+
+func (*nopLogger) NewClient(Config)                                   {}
+func (*nopLogger) HttpRequest(context.Context, *http.Request, []byte) {}
+func (*nopLogger) HttpResponse(context.Context, *http.Response)       {}
+func (*nopLogger) Response(context.Context, ewsxml.ResponseMessage)   {}

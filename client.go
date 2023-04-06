@@ -59,7 +59,7 @@ func NewClient(url string, ver Version, opts ...Option) (*Client, error) {
 		return nil, err
 	}
 
-	c.log.LogClientStart(c.Url, c.Version)
+	c.log.NewClient(c.Config)
 	return c, nil
 }
 
@@ -96,7 +96,7 @@ func (c *Client) Do(req *Request) (*http.Response, error) {
 	}
 
 	httpReq.Header.Set("Content-Type", "text/xml")
-	c.log.LogHttpRequest(req.ctx, httpReq, body.Bytes())
+	c.log.HttpRequest(req.ctx, httpReq, body.Bytes())
 
 	var httpResp *http.Response
 	var attempt uint8
@@ -126,7 +126,7 @@ func (c *Client) do(ctx context.Context, req *http.Request) (*http.Response, err
 		return nil, errors.WithKind(err, RequestError)
 	}
 
-	c.log.LogHttpResponse(ctx, resp)
+	c.log.HttpResponse(ctx, resp)
 	return resp, nil
 }
 
@@ -163,7 +163,7 @@ func (c *Client) Request(req *Request, out interface{}) (err error) {
 		return errors.WithKind(err, UnmarshalError)
 	}
 	if resp, ok := out.(ewsxml.Response); ok {
-		c.log.LogResponse(req.ctx, *resp.Response())
+		c.log.Response(req.ctx, *resp.Response())
 		if err = newResponseError(resp.Response()); err != nil {
 			return errors.WithStack(err)
 		}
