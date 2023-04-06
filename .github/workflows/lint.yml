@@ -11,5 +11,5 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v4
       - uses: golangci/golangci-lint-action@v3
