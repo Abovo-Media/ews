@@ -14,7 +14,7 @@ import (
 	"github.com/go-pogo/writing"
 )
 
-const PanicNilBody = "body must be a non-nil value"
+const panicNilBody = "ews.NewRequest: body must be a non-nil value"
 
 type Request struct {
 	ctx  context.Context
@@ -30,7 +30,7 @@ func NewRequest(ctx context.Context, head *ewsxml.Header, body interface{}) *Req
 		head = new(ewsxml.Header)
 	}
 	if body == nil {
-		panic(PanicNilBody)
+		panic(panicNilBody)
 	}
 
 	return &Request{
