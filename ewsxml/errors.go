@@ -68,14 +68,14 @@ const (
 
 	// ErrorAttachmentNestLevelLimitExceeded specifies that an attempt was made
 	// to create an item with more than 10 nested attachments. This value was
-	// introduced in Exchange LogClientStart 2010 Service Pack 2 (SP2).
+	// introduced in Exchange Server 2010 Service Pack 2 (SP2).
 	ErrorAttachmentNestLevelLimitExceeded ResponseCode = "ErrorAttachmentNestLevelLimitExceeded"
 
 	// ErrorAttachmentSizeLimitExceeded is returned by the CreateAttachment
 	// element if an attempt is made to create an attachment with size
-	// exceeding TryInt32.MaxValue, in bytes. The GetAttachment element returns
+	// exceeding Int32.MaxValue, in bytes. The GetAttachment element returns
 	// this error if an attempt to retrieve an existing attachment with size
-	// exceeding TryInt32.MaxValue, in bytes.
+	// exceeding Int32.MaxValue, in bytes.
 	ErrorAttachmentSizeLimitExceeded ResponseCode = "ErrorAttachmentSizeLimitExceeded"
 
 	// ErrorAutoDiscoverFailed indicates that Exchange Web Services tried to
@@ -418,7 +418,7 @@ const (
 	ErrorCrossMailboxMoveCopy ResponseCode = "ErrorCrossMailboxMoveCopy"
 
 	// ErrorCrossSiteRequest indicates that the request is not allowed because
-	// the Client Access server that should service the request is in a
+	// the Client Log server that should service the request is in a
 	// different site.
 	ErrorCrossSiteRequest ResponseCode = "ErrorCrossSiteRequest"
 
@@ -568,7 +568,7 @@ const (
 
 	// ErrorImContactLimitReached is returned when new instant messaging (IM)
 	// contacts cannot be added because the maximum number of contacts has been
-	// reached. This error was introduced in Exchange LogClientStart 2013.
+	// reached. This error was introduced in Exchange NewClient 2013.
 	ErrorImContactLimitReached ResponseCode = "ErrorImContactLimitReached"
 
 	// ErrorImGroupDisplayNameAlreadyExists is returned when an attempt is made
@@ -590,7 +590,7 @@ const (
 
 	// ErrorImpersonationDenied is returned in the server-to-server
 	// authorization for Exchange Impersonation when the caller does not have
-	// the proper rights to impersonate through the Client Access server that
+	// the proper rights to impersonate through the Client Log server that
 	// they are making the request against. This maps to the
 	// ms-Exch-EPI-Impersonation extended Active Directory right.
 	ErrorImpersonationDenied ResponseCode = "ErrorImpersonationDenied"
@@ -604,7 +604,7 @@ const (
 	ErrorImpersonationFailed ResponseCode = "ErrorImpersonationFailed"
 
 	// ErrorIncorrectSchemaVersion indicates that the request was valid for the
-	// current Exchange LogClientStart version but was invalid for the request server
+	// current Exchange NewClient version but was invalid for the request server
 	// version that was specified.
 	ErrorIncorrectSchemaVersion ResponseCode = "ErrorIncorrectSchemaVersion"
 
@@ -690,9 +690,9 @@ const (
 
 	// ErrorInvalidCompleteDate is returned when an attempt is made to set the
 	// CompleteDate element value of a task to a time in the future. When it is
-	// converted to the local time of the Client Access server, the
+	// converted to the local time of the Client Log server, the
 	// CompleteDate of a task cannot be set to a value that is later than the
-	// local time on the Client Access server.
+	// local time on the Client Log server.
 	ErrorInvalidCompleteDate ResponseCode = "ErrorInvalidCompleteDate"
 
 	// ErrorInvalidContactEmailAddress indicates that an invalid e-mail address
@@ -950,7 +950,7 @@ const (
 	ErrorInvalidNameForNameResolution ResponseCode = "ErrorInvalidNameForNameResolution"
 
 	// ErrorInvalidNetworkServiceContext indicates an error in the Network
-	// Service account on the Client Access server.
+	// Service account on the Client Log server.
 	ErrorInvalidNetworkServiceContext ResponseCode = "ErrorInvalidNetworkServiceContext"
 
 	// ErrorInvalidOofParameter is not used.
@@ -1202,7 +1202,7 @@ const (
 	// ErrorInvalidSubfilterTypeNotRecipientType ResponseCode = "ErrorInvalidSubfilterTypeNotRecipientType"
 
 	// ErrorInvalidSubscription indicates that the subscription is no longer
-	// valid. This could be because the Client Access server is restarting or
+	// valid. This could be because the Client Log server is restarting or
 	// because the subscription is expired.
 	ErrorInvalidSubscription ResponseCode = "ErrorInvalidSubscription"
 
@@ -1353,7 +1353,7 @@ const (
 	// ErrorManagedFolderNotFound occurs when the folder name that was
 	// specified in the request does not map to a managed folder definition in
 	// AD DS. You can only create instances of managed folders for folders that
-	// are defined in AD DS. Check the name and try again.
+	// are defined in AD DS. Request the name and try again.
 	ErrorManagedFolderNotFound ResponseCode = "ErrorManagedFolderNotFound"
 
 	// ErrorManagedFoldersRootFailure indicates that the managed folders root
@@ -1497,19 +1497,19 @@ const (
 
 	// ErrorNoDestinationCASDueToKerberosRequirements indicates that the
 	// request referred to a mailbox in another Active Directory site, but no
-	// Client Access servers in the destination site were configured for
+	// Client Log servers in the destination site were configured for
 	// Windows Authentication, and therefore the request could not be proxied.
 	ErrorNoDestinationCASDueToKerberosRequirements ResponseCode = "ErrorNoDestinationCASDueToKerberosRequirements"
 
 	// ErrorNoDestinationCASDueToSSLRequirements indicates that the request
 	// referred to a mailbox in another Active Directory site, but no Client
-	// Access servers in the destination site were configured for SSL
+	// Log servers in the destination site were configured for SSL
 	// connections, and therefore the request could not be proxied.
 	ErrorNoDestinationCASDueToSSLRequirements ResponseCode = "ErrorNoDestinationCASDueToSSLRequirements"
 
 	// ErrorNoDestinationCASDueToVersionMismatch indicates that the request
 	// referred to a mailbox in another Active Directory site, but no Client
-	// Access servers in the destination site were of an acceptable product
+	// Log servers in the destination site were of an acceptable product
 	// version to receive the request, and therefore the request could not be
 	// proxied.
 	ErrorNoDestinationCASDueToVersionMismatch ResponseCode = "ErrorNoDestinationCASDueToVersionMismatch"
@@ -1541,7 +1541,7 @@ const (
 
 	// ErrorNoPropertyTagForCustomProperties indicates that MAPI properties in
 	// the custom range, 0x8000 and greater, cannot be referenced by property
-	// tags. You must use the EWS Managed API PropertySetIdproperty or the EWS
+	// tags. You must use the EwsLogger Managed API PropertySetIdproperty or the EwsLogger
 	// ExtendedFieldURI element with the PropertySetId attribute.
 	ErrorNoPropertyTagForCustomProperties ResponseCode = "ErrorNoPropertyTagForCustomProperties"
 
@@ -1555,7 +1555,7 @@ const (
 
 	// ErrorNoRespondingCASInDestinationSite indicates that the request
 	// referred to a mailbox in another Active Directory site, but none of the
-	// Client Access servers in that site responded, and therefore the request
+	// Client Log servers in that site responded, and therefore the request
 	// could not be proxied.
 	ErrorNoRespondingCASInDestinationSite ResponseCode = "ErrorNoRespondingCASInDestinationSite"
 
@@ -1589,7 +1589,7 @@ const (
 	// ErrorOccurrenceTimeSpanTooBig indicates that the time allotment for a
 	// given occurrence overlaps with another occurrence of the same recurring
 	// item. This response also occurs when the length in minutes of a given
-	// occurrence is larger than TryInt32.MaxValue.
+	// occurrence is larger than Int32.MaxValue.
 	ErrorOccurrenceTimeSpanTooBig ResponseCode = "ErrorOccurrenceTimeSpanTooBig"
 
 	// ErrorOperationNotAllowedWithPublicFolderRoot indicates that the current
@@ -1645,8 +1645,8 @@ const (
 	// ErrorPropertyValidationFailure ResponseCode = "ErrorPropertyValidationFailure"
 
 	// ErrorProxiedSubscriptionCallFailure indicates that the request referred
-	// to a subscription that exists on another Client Access server, but an
-	// attempt to proxy the request to that Client Access server failed.
+	// to a subscription that exists on another Client Log server, but an
+	// attempt to proxy the request to that Client Log server failed.
 	ErrorProxiedSubscriptionCallFailure ResponseCode = "ErrorProxiedSubscriptionCallFailure"
 
 	// ErrorProxyCallFailed is not used.
@@ -1658,7 +1658,7 @@ const (
 	ErrorProxyGroupSidLimitExceeded ResponseCode = "ErrorProxyGroupSidLimitExceeded"
 
 	// ErrorProxyRequestNotAllowed indicates that the request that Exchange Web
-	// Services sent to another Client Access server when trying to fulfill a
+	// Services sent to another Client Log server when trying to fulfill a
 	// GetUserAvailabilityRequest request was invalid. This response code
 	// typically indicates that a configuration or rights error has occurred,
 	// or that someone tried unsuccessfully to mimic an availability proxy
@@ -1666,7 +1666,7 @@ const (
 	ErrorProxyRequestNotAllowed ResponseCode = "ErrorProxyRequestNotAllowed"
 
 	// ErrorProxyRequestProcessingFailed indicates that Exchange Web Services
-	// tried to proxy an availability request to another Client Access server
+	// tried to proxy an availability request to another Client Log server
 	// for fulfillment, but the request failed. This response can be caused by
 	// network connectivity issues or request timeout issues.
 	ErrorProxyRequestProcessingFailed ResponseCode = "ErrorProxyRequestProcessingFailed"
@@ -1691,14 +1691,14 @@ const (
 
 	// ErrorPublicFolderRequestProcessingFailed occurs when the recipient that
 	// was passed to the GetUserAvailability operation is located on a computer
-	// that is running a version of Exchange LogClientStart that is earlier than
+	// that is running a version of Exchange NewClient that is earlier than
 	// Exchange 2007, and the request to retrieve free/busy information for the
 	// recipient from the public folder server failed.
 	ErrorPublicFolderRequestProcessingFailed ResponseCode = "ErrorPublicFolderRequestProcessingFailed"
 
 	// ErrorPublicFolderServerNotFound occurs when the recipient that was
 	// passed to the GetUserAvailability operation is located on a computer
-	// that is running a version of Exchange LogClientStart that is earlier than
+	// that is running a version of Exchange NewClient that is earlier than
 	// Exchange 2007, and the request to retrieve free/busy information for
 	// the recipient from the public folder server failed because the
 	// organizational unit did not have an associated public folder server.
@@ -1711,7 +1711,7 @@ const (
 	ErrorPublicFolderSyncException ResponseCode = "ErrorPublicFolderSyncException"
 
 	// ErrorQueryFilterTooLong indicates that the search folder restriction may
-	// be valid, but it is not supported by EWS. Exchange Web Services limits
+	// be valid, but it is not supported by EwsLogger. Exchange Web Services limits
 	// restrictions to contain a maximum of 255 filter expressions. If you try
 	// to bind to an existing search folder that exceeds 255, this response
 	// code is returned.
@@ -1903,12 +1903,12 @@ const (
 	ErrorTeamMailboxNotFound ResponseCode = "ErrorTeamMailboxNotFound"
 
 	// ErrorTeamMailboxNotLinkedToSharePoint indicates that a team mailbox was
-	// found but that it is not linked to a SharePoint LogClientStart.
+	// found but that it is not linked to a SharePoint NewClient.
 	// This error was introduced in Exchange 2013.
 	ErrorTeamMailboxNotLinkedToSharePoint ResponseCode = "ErrorTeamMailboxNotLinkedToSharePoint"
 
 	// ErrorTeamMailboxUrlValidationFailed indicates that a team mailbox was
-	// found but that the link to the SharePoint LogClientStart is not valid.
+	// found but that the link to the SharePoint NewClient is not valid.
 	// This error was introduced in Exchange 2013.
 	ErrorTeamMailboxUrlValidationFailed ResponseCode = "ErrorTeamMailboxUrlValidationFailed"
 
@@ -1948,7 +1948,7 @@ const (
 
 	// ErrorTokenSerializationDenied occurs if the caller tries to do a Token
 	// serialization request but does not have the
-	// ms-Exch-EPI-TokenSerialization right on the Client Access server.
+	// ms-Exch-EPI-TokenSerialization right on the Client Log server.
 	ErrorTokenSerializationDenied ResponseCode = "ErrorTokenSerializationDenied"
 
 	// ErrorTooManyObjectsOpened occurs when the internal limit on open objects
@@ -2011,7 +2011,7 @@ const (
 	ErrorUnsupportedPropertyDefinition ResponseCode = "ErrorUnsupportedPropertyDefinition"
 
 	// ErrorUnsupportedQueryFilter indicates that the search folder restriction
-	// may be valid, but it is not supported by EWS.
+	// may be valid, but it is not supported by EwsLogger.
 	ErrorUnsupportedQueryFilter ResponseCode = "ErrorUnsupportedQueryFilter"
 
 	// ErrorUnsupportedRecurrence indicates that the specified recurrence is
